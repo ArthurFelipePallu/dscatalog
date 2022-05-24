@@ -9,6 +9,5 @@ import com.devsuperior.dscatalog.entities.Category;
 public interface CategoryRepository extends JpaRepository<Category,Long>{
 	
 	
-	
 
 }
