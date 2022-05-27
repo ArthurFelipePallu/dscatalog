@@ -1,12 +1,16 @@
 package com.devsuperior.dscatalog.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -20,6 +24,12 @@ public class Category implements Serializable{
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Long id;
 	private String Name;
+	
+	/*Armazena o momento de criação da categoria com o padrão UTC (SEM ESPECIFICAR UMA TIMEZONE)"*/
+	@Column(columnDefinition="TIMESTAMP WITHOUT TIME ZONE") /*Armazena o tempo de criação da categoria com*/
+	private Instant createdAt;
+	@Column(columnDefinition="TIMESTAMP WITHOUT TIME ZONE") /*Armazena o tempo de criação da categoria com*/
+	private Instant updatedAt;
 	
 	public Category() {
 		
@@ -49,6 +59,22 @@ public class Category implements Serializable{
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
+	}
+
+	public Instant getCreatedAt() {
+		return createdAt;
+	}
+
+	public Instant getUpdatedAt() {
+		return updatedAt;
+	}
+	@PrePersist /*Anotation fará esse código rodar precedente à criação do objeto*/
+	public void prePersist() {
+		createdAt = Instant.now();
+	}
+	@PreUpdate /*Anotation fará esse código rodar precedente ao update do objeto*/
+	public void preUpdate() {
+		updatedAt = Instant.now();
 	}
 
 	@Override
