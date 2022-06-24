@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +36,8 @@ public class ProductResource {
 		List<ProductDTO> list = category_service.findAll();
 		return ResponseEntity.ok().body(list);
 	}*/
-	
-	@GetMapping        /*   NOVO       */
+	/*
+	@GetMapping          NOVO      
 	public ResponseEntity<Page<ProductDTO>> findAll(
 			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
@@ -50,6 +51,16 @@ public class ProductResource {
 		
 		return ResponseEntity.ok().body(list);
 	}
+	*/
+	
+	@GetMapping
+	public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable){
+		
+		Page<ProductDTO> list = product_service.findAllPageable(pageable);
+		
+		return ResponseEntity.ok().body(list);
+	}
+	
 	
 	@GetMapping(value="/{id}")
 	public ResponseEntity<ProductDTO> findById(@PathVariable Long id){

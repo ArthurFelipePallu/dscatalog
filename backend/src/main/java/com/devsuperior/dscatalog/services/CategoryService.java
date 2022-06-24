@@ -9,14 +9,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.CategoryDTO;
+import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.entities.Category;
+import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+
 
 /*Anotation registra a classe como um componente que participa da injeção de dependencias automatizado do spring,
  * quem vai gerenciar as instancias da injeção de dependencia será o próprio spring
@@ -39,6 +43,11 @@ public class CategoryService {
 		return list.map(x->new CategoryDTO(x));
 	}
 	
+	@Transactional(readOnly = true)        /*  NOVO       */
+	public Page<CategoryDTO> findAllPageable(Pageable pageable){
+		Page<Category> list = repository.findAll(pageable); 
+		return list.map(x->new CategoryDTO(x));
+	}
 	
 	
 	@Transactional(readOnly = true)
