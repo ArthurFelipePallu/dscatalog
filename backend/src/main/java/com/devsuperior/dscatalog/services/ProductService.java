@@ -23,9 +23,10 @@ import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
-/*Anotation registra a classe como um componente que participa da injeção de dependencias automatizado do spring,
- * quem vai gerenciar as instancias da injeção de dependencia será o próprio spring
- * */
+
+
+
+
 @Service
 public class ProductService {
 
