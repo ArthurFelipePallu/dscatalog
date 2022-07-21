@@ -21,7 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -36,11 +38,16 @@ public class ProductServiceTests {
 	@Mock
 	private ProductRepository repository;
 
+	@Mock
+	private CategoryRepository categoryRepository;
+
+	
 	private long existingId;
 	private long nonExistingId;
 	private long dependentId;
 	private PageImpl<Product> page;
 	private PageImpl<ProductDTO> pageDTO;
+	private Category category;
 	private Product product;
 	private ProductDTO productDTO;
 
@@ -50,6 +57,7 @@ public class ProductServiceTests {
 		existingId =1L;
 		nonExistingId = 1000L;
 		dependentId = 4L;
+		category = Factory.createCategory();
 		product = Factory.createProduct();
 		productDTO = Factory.createProductDTO();
 		page = new PageImpl<>(List.of(product));
@@ -62,12 +70,15 @@ public class ProductServiceTests {
 		//Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 
 		
-		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
+		
+		Mockito.when(repository.save(product)).thenReturn(product);
 		
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 
 		
+		Mockito.when(repository.getReferenceById(existingId)).thenReturn(product);
+		Mockito.when(categoryRepository.getReferenceById(existingId)).thenReturn(category);
 		
 		/*doNothing do mockito é colocado antes do when por serr usado funções que retornam VOID*/
 		Mockito.doNothing().when(repository).deleteById(existingId);
@@ -77,6 +88,26 @@ public class ProductServiceTests {
 	
 	
 
+	
+	 /*-----------------     SAVE TESTS     -------------------------------------------------------*/
+
+
+
+	@Test
+	public void insertShouldReturnProductDTO() {
+		
+		ProductDTO result = service.insert(productDTO);
+		
+		Assertions.assertNotNull(result);		
+		
+		/* Verifica se o método deleteById foi chamada dentro da ação do teste*/
+		/* Mockito.times especifica quantas vezes o método deve ter sido chamado durante a ação do teste  */
+		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste*/
+		Mockito.verify(repository,Mockito.times(1)).save(product);
+	}
+	
+	
+	
 	
 	
 	
