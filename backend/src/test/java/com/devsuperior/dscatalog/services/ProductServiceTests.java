@@ -71,6 +71,11 @@ public class ProductServiceTests {
 		Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 		//Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 
+
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(nonExistingId)).thenReturn(null);
+
+		
 		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
 		
 		//Mockito.when(repository.save(product)).thenReturn(product);
@@ -90,7 +95,24 @@ public class ProductServiceTests {
 		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(dependentId);
 	}
 	
+	/*-----------------     FIND BY ID TESTS     -------------------------------------------------------*/
+
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExists() {
+		
+		ProductDTO result = service.findById(existingId);
+		Assertions.assertNotNull(result);
+		Mockito.verify(repository,Mockito.times(1)).findById(existingId);	
+	}
 	
+	@Test
+	public void findByIdShouldReturnResourceNotFoundExceptionWhenIdDoesNotExists() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class,()->{
+			service.findById(nonExistingId);
+		});	
+		Mockito.verify(repository,Mockito.times(1)).findById(nonExistingId);	
+	}
 	
 	/*-----------------     UPDATE TESTS     -------------------------------------------------------*/
 
@@ -132,8 +154,8 @@ public class ProductServiceTests {
 		
 		/*Verifica se o método deleteById foi chamada dentro da ação do teste*/
 		/* Mockito.times especifica quantas vezes o método deve ter sido chamado durante a ação do teste  */
-		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste
-		Mockito.verify(repository,Mockito.times(1)).save(product);*/
+		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste*/
+		Mockito.verify(repository,Mockito.times(1)).save(ArgumentMatchers.any());
 	}
 	
 	
