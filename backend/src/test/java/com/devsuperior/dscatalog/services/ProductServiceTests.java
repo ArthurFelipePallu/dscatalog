@@ -4,6 +4,8 @@ package com.devsuperior.dscatalog.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,17 +71,19 @@ public class ProductServiceTests {
 		Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 		//Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 
+		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
 		
-		
-		Mockito.when(repository.save(product)).thenReturn(product);
+		//Mockito.when(repository.save(product)).thenReturn(product);
 		
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 
 		
 		Mockito.when(repository.getReferenceById(existingId)).thenReturn(product);
+		Mockito.doThrow(EntityNotFoundException.class).when(repository).getReferenceById(nonExistingId);
 		Mockito.when(categoryRepository.getReferenceById(existingId)).thenReturn(category);
-		
+		Mockito.doThrow(EntityNotFoundException.class).when(categoryRepository).getReferenceById(nonExistingId);
+
 		/*doNothing do mockito é colocado antes do when por serr usado funções que retornam VOID*/
 		Mockito.doNothing().when(repository).deleteById(existingId);
 		Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
@@ -87,11 +91,37 @@ public class ProductServiceTests {
 	}
 	
 	
+	
+	/*-----------------     UPDATE TESTS     -------------------------------------------------------*/
+
+
+	@Test
+	public void updateShouldReturnProductDTO() {
+		
+		ProductDTO result = service.update(existingId,productDTO);
+		
+		Assertions.assertNotNull(result);		
+		
+		/* Verifica se o método deleteById foi chamada dentro da ação do teste*/
+		/* Mockito.times especifica quantas vezes o método deve ter sido chamado durante a ação do teste  */
+		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste*/
+		Mockito.verify(repository,Mockito.times(1)).save(product);
+		Mockito.verify(repository,Mockito.times(1)).getReferenceById(existingId);
+	}
+	
+	@Test
+	public void updateShouldThrowEntityNotFoundExceptionWhenNonExistingEntity() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class,()->{
+			service.update(nonExistingId,productDTO);
+			
+		});	
+	}
 
 	
 	 /*-----------------     SAVE TESTS     -------------------------------------------------------*/
 
-
+	
 
 	@Test
 	public void insertShouldReturnProductDTO() {
@@ -100,10 +130,10 @@ public class ProductServiceTests {
 		
 		Assertions.assertNotNull(result);		
 		
-		/* Verifica se o método deleteById foi chamada dentro da ação do teste*/
+		/*Verifica se o método deleteById foi chamada dentro da ação do teste*/
 		/* Mockito.times especifica quantas vezes o método deve ter sido chamado durante a ação do teste  */
-		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste*/
-		Mockito.verify(repository,Mockito.times(1)).save(product);
+		/* Mockito.never especifica que o método não deve ser chamado durante a ação do teste
+		Mockito.verify(repository,Mockito.times(1)).save(product);*/
 	}
 	
 	
